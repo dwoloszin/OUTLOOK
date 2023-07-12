@@ -1,0 +1,9 @@
+/credentials/
+/.venv/
+/external-lib/
+/export/
+/import/
+/attachments/
+/old/
+/__pycache__/
+

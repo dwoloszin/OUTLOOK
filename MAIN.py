@@ -31,9 +31,11 @@ def save_attachments(mail_item, emails):
     for attachment in attachments:
         if attachment.FileName.startswith("TSSR_"):
             attachment_path = os.path.join(attachment_dir, attachment.FileName)
+            # Save TSSR if necessary
+            '''
             if not os.path.exists(attachment_path):  # Check if file doesn't exist
                 attachment.SaveAsFile(attachment_path)
-            
+            '''
             # Add attachment name to the emails list
             email_details = {
                 'Subject': mail_item.Subject,
@@ -67,7 +69,7 @@ def get_outlook_emails():
                 'ReceivedTime': item.ReceivedTime.astimezone(timezone.utc),
             }
             emails.append(email_details)
-
+            #Save att if necessary
             save_attachments(item, emails)  # Save attachments if available
 
     df = pd.DataFrame(emails)  # Convert list of dictionaries to DataFrame

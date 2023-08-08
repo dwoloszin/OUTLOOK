@@ -74,7 +74,7 @@ def ImportDF2(fields, pathImport,subnetcheck):
     return frameSI  
 
 
-def ImportDF3(fields, pathImport):
+def ImportDF3(fields, pathImport,skiprowss):
     pathImportSI = os.getcwd() + pathImport
     all_filesSI = glob.glob(pathImportSI + "/*.csv")
     all_filesSI.sort(key=lambda x: os.path.getmtime(x), reverse=True)
@@ -82,7 +82,7 @@ def ImportDF3(fields, pathImport):
     lastData = datetime.fromtimestamp(getmtime(all_filesSI[0])).strftime('%Y%m%d')
     for filename in all_filesSI:
         fileData = datetime.fromtimestamp(getmtime(filename)).strftime('%Y%m%d')
-        iter_csv = pd.read_csv(filename, index_col=None, encoding="ANSI",header=0, on_bad_lines='skip',dtype=str, sep = ';',iterator=True, chunksize=10000, usecols = fields )
+        iter_csv = pd.read_csv(filename, index_col=None, skiprows=skiprowss, encoding="ANSI",header=0, on_bad_lines='skip',dtype=str, sep = ';',iterator=True, chunksize=10000, usecols = fields )
         df = pd.concat([chunk for chunk in iter_csv]) # & |  WORKS
         df2 = df[fields] # ordering labels 
         #df2["dataArchive_Import"] = fileData   
@@ -112,5 +112,4 @@ def ImportDF_Xlsx(pathImport,columnsAnalise):
   frameSI = frameSI.drop_duplicates()
   frameSI = frameSI.reset_index(drop=True)
   return frameSI    
-
 

@@ -7,6 +7,9 @@ import ShortName
 import ImportDF
 import time
 import re
+from getFileFromWeb import download_csv_files
+
+
 timeexport = time.strftime("%Y%m%d_")
 script_dir = os.path.abspath(os.path.dirname(sys.argv[0]) or '.')
 csv_path = os.path.join(script_dir, 'export/'+timeexport+'OutLook'+'.csv')
@@ -83,7 +86,7 @@ def get_outlook_emails():
 
     fields = ['NAME', 'LOCATION', 'ANF', 'MUNICIPIO']
     pathImport = '\import\MobileSite'
-    MobileSite = ImportDF.ImportDF3(fields, pathImport)
+    MobileSite = ImportDF.ImportDF3(fields, pathImport,0)
     MobileSite = ShortName.tratarShortNumber(MobileSite, 'NAME')
     MobileSite.drop(['NAME'], axis=1, inplace=True)
 
@@ -94,28 +97,39 @@ def get_outlook_emails():
     df["Rev_Archive"] = df['AttachmentName'].str[-5:-4]
     
     pathImportAnalise = '\import\Analise'
-    columnsAnalise = ['Analise','Status','Elemento_ID (Site_ID)','Rev RF','OBS RF']
+    columnsAnalise = ['Analise','Status','Site_ID','Rev RF','OBS RF']
     Analise = ImportDF.ImportDF_Xlsx(pathImportAnalise,columnsAnalise)
     Analise['Analise'] = pd.to_datetime(Analise['Analise'], format="%Y-%m-%d")
     Analise['Status'] = Analise['Status'].str.upper()
+    print(Analise)
 
     Analise.sort_values(by='Analise', ascending=False, inplace=True)
-    subnetcheck = ['Elemento_ID (Site_ID)']
+    subnetcheck = ['Site_ID']
     Analise.drop_duplicates(subset=subnetcheck, keep='first', inplace=True, ignore_index=False)
-    df = pd.merge(df, Analise, how='left', left_on=['SiteName'], right_on=['Elemento_ID (Site_ID)'])
-    df.drop(['Elemento_ID (Site_ID)'], axis=1, inplace=True)
+    df = pd.merge(df, Analise, how='left', left_on=['SiteName'], right_on=['Site_ID'])
+    df.drop(['Site_ID'], axis=1, inplace=True)
 
     df.loc[(~df['Rev RF'].isna()) & (df['Rev RF'] != df['Rev_Archive']),['OBS']] = 'RevArchiveDiffAnalise'
 
 
     pathImportPRIO = '\import\PRIO'
-    columnsPRIO = ['SiteName','MOS']
+    columnsPRIO = ['SiteName','MOS','STEP']
     PRIO = ImportDF.ImportDF_Xlsx(pathImportPRIO,columnsPRIO)
     PRIO['MOS'] = pd.to_datetime(PRIO['MOS'], format="%Y-%m-%d")
     PRIO.sort_values(by='MOS', ascending=False, inplace=True)
     subnetcheck = ['SiteName']
     PRIO.drop_duplicates(subset=subnetcheck, keep='first', inplace=True, ignore_index=False)
     PRIO.rename(columns={'SiteName': 'SiteName_PRIO'}, inplace=True)
+
+
+
+    fields_PMO = ['ORDEM_COMPLEXA', 'STATUS_OC']
+    pathImportPMO = '\import/reports'
+    PMO = ImportDF.ImportDF3(fields_PMO, pathImportPMO,1)
+
+    #PMO.rename(columns={'SHORT': 'SHORT2'}, inplace=True)
+    df = pd.merge(df, PMO, how='left', left_on=['OC'], right_on=['ORDEM_COMPLEXA'])
+    df.drop(['ORDEM_COMPLEXA'], axis=1, inplace=True)
 
 
    
@@ -130,7 +144,7 @@ def get_outlook_emails():
     df.reset_index(drop=True, inplace=True)
     df.sort_values(by=['MOS','ReceivedTime'], ascending=[True,True], inplace=True)
 
-
+    df.loc[df['Status'].isna(),['Status']] = 'SEM 1° ANALISE'
 
     df.drop_duplicates(inplace=True, ignore_index=True)
     df.to_csv(csv_path, sep=';',encoding='ANSI', index=False)  # Save DataFrame as CSV
@@ -143,4 +157,15 @@ def get_outlook_emails():
 if not os.path.exists(attachment_dir):
     os.makedirs(attachment_dir)
 
-print(get_outlook_emails())
+
+
+
+
+
+if __name__ == "__main__":
+  folder_path = "reports/"
+  prefix = "radar_pmo_"
+  save_path = "import/reports"  # Change this to your desired save path
+  download_csv_files(folder_path,prefix,save_path)
+  print(get_outlook_emails())
+

@@ -104,6 +104,7 @@ def ImportDF_Xlsx(pathImport,columnsAnalise):
     #data = pd.read_excel(filename,skiprows=27,sheet_name = 'DUMP_5G_DSS', nrows=40,usecols = 'A:AC')
     #data = pd.read_excel(filename,skiprows=skip_rows,sheet_name = sheetname,usecols = fields,na_filter= False)
     data = pd.read_excel(filename,usecols = columnsAnalise,na_filter= False)
+    #data = pd.read_excel(filename,sheet_name = 'Controle TSSR',usecols = columnsAnalise,na_filter= False)
     li.append(data)
     #frameSI = df.append(data,ignore_index=True)
     #frameSI = frameSI[fields] # ordering labels 

@@ -8,6 +8,7 @@ import ImportDF
 import time
 import re
 from getFileFromWeb import download_csv_files
+from getFileFromFolder import copyFiles
 
 
 timeexport = time.strftime("%Y%m%d_")
@@ -167,5 +168,7 @@ if __name__ == "__main__":
   prefix = "radar_pmo_"
   save_path = "import/reports"  # Change this to your desired save path
   download_csv_files(folder_path,prefix,save_path)
+  copyFiles()
+
   print(get_outlook_emails())
 

@@ -9,14 +9,22 @@ import time
 import re
 from getFileFromWeb import download_csv_files
 from getFileFromFolder import copyFiles
+import timeit
+import util
+credentials = util.getCredentials()
+
+
+
+print ('\nprocessing... ')
+inicio = timeit.default_timer()
 
 
 timeexport = time.strftime("%Y%m%d_")
 script_dir = os.path.abspath(os.path.dirname(sys.argv[0]) or '.')
 csv_path = os.path.join(script_dir, 'export/'+timeexport+'OutLook'+'.csv')
 attachment_dir = os.path.join(script_dir, 'attachments')
-
-
+attachment_dir = credentials['Folder_to_save'] # this code has some problem about encoding especial charactere
+attachment_dir = '//internal/FileServer/TBR/Network/NetworkAssurance/RegionalNetworkAssurance-SP/RSQA/10.Organização da rede/_EQUIPE PROJETOS_/TSSR'
 
 def process_email_body(body, num_lines=8):
     # Split the body text into lines based on newline character
@@ -32,14 +40,15 @@ def process_email_body(body, num_lines=8):
 
 def save_attachments(mail_item, emails):
     attachments = mail_item.Attachments
+    
     for attachment in attachments:
         if attachment.FileName.startswith("TSSR_"):
             attachment_path = os.path.join(attachment_dir, attachment.FileName)
             # Save TSSR if necessary
-            '''
+   
             if not os.path.exists(attachment_path):  # Check if file doesn't exist
                 attachment.SaveAsFile(attachment_path)
-            '''
+                print(f"Saving TSSR files: {attachment.FileName}")
             # Add attachment name to the emails list
             email_details = {
                 'Subject': mail_item.Subject,
@@ -171,4 +180,6 @@ if __name__ == "__main__":
   copyFiles()
 
   print(get_outlook_emails())
+  fim = timeit.default_timer()
+  print ('duracao: %.2f' % ((fim - inicio)/60) + ' min') 
 

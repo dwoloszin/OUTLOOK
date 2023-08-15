@@ -1,13 +1,11 @@
-# Arquivo com métodos úteis
 import yaml
 
 def getCredentials():
-    
-  # pegando as credenciais das apis
-  with open("./credentials/credentials.yml","r") as c:
-    try:
-      credentials = yaml.safe_load(c)
-    except yaml.YAMLError as exc:
-      credentials = exc
+    # Get credentials from the APIs
+    with open("./credentials/credentials.yml", "r", encoding="ANSI") as c:
+        try:
+            credentials = yaml.safe_load(c)
+        except yaml.YAMLError as exc:
+            credentials = exc
   
-  return credentials
+    return credentials

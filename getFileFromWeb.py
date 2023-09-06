@@ -39,7 +39,7 @@ def download_csv_files(folder_path,prefix,save_path):
             print(f"Failed to download: {csv_filename}")
 
     # Remove older archives if more than one archive remains
-    downloaded_csv_files = [file for file in os.listdir(save_path) if file.endswith('.csv')]
+    downloaded_csv_files = [file for file in os.listdir(save_path) if file.startswith(prefix) & file.endswith('.csv')]
     if len(downloaded_csv_files) > 1:
         oldest_file = min(downloaded_csv_files, key=lambda x: os.path.getctime(os.path.join(save_path, x)), default=None)
         if oldest_file:
